@@ -5,8 +5,11 @@
       <map>
         <entry key="..\:/Users/momen/.gradle/caches/transforms-3/d34d422f61283604d9d9a4794eeec026/transformed/facebook-common-12.3.0/res/drawable/com_facebook_button_icon.xml" value="0.225" />
         <entry key="..\:/Users/momen/projects/SocialMediaIntegration/app/src/main/res/drawable/bg_button_facebook.xml" value="0.225" />
+        <entry key="..\:/Users/momen/projects/SocialMediaIntegration/app/src/main/res/drawable/subtracted_circle.xml" value="0.2985" />
         <entry key="..\:/Users/momen/projects/SocialMediaIntegration/app/src/main/res/layout/activity_login.xml" value="0.34923076923076923" />
+        <entry key="..\:/Users/momen/projects/SocialMediaIntegration/app/src/main/res/layout/activity_login2.xml" value="0.358695652173913" />
         <entry key="..\:/Users/momen/projects/SocialMediaIntegration/app/src/main/res/layout/activity_main.xml" value="0.3546875" />
+        <entry key="..\:/Users/momen/projects/SocialMediaIntegration/app/src/main/res/layout/activity_profile.xml" value="0.35260416666666666" />
       </map>
     </option>
   </component>

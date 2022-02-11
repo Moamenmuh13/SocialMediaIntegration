@@ -10,14 +10,18 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.facebook.CallbackManager
-import com.facebook.FacebookCallback
-import com.facebook.FacebookException
+import com.facebook.*
+import com.facebook.appevents.AppEventsLogger
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
+import com.facebook.login.widget.ProfilePictureView
 import mundroid.apps.socialmediaintegration.databinding.ActivityLoginBinding
+import org.json.JSONException
+import org.json.JSONObject
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
@@ -29,62 +33,80 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
+
+        FacebookSdk.fullyInitialize()
+        AppEventsLogger.activateApp(application)
+
         callbackManager = CallbackManager.Factory.create()
+
         initViews()
-        printHashKey()
 
-    }
-
-    @SuppressLint("PackageManagerGetSignatures")
-    private fun printHashKey() {
-        try {
-            val info = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
-            for (signature in info.signatures) {
-                val md = MessageDigest.getInstance("SHA")
-                md.update(signature.toByteArray())
-                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT))
-            }
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-        } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace()
-        }
     }
 
 
     private fun initViews() {
-        binding.facebookBtn.setOnClickListener(this)
+        binding.loginButton.setOnClickListener(this)
 //        binding.facebookBtn.setReadPermissions(listOf(EMAIL))
     }
 
     override fun onClick(v: View?) {
         when (v) {
-            binding.facebookBtn -> {
+            binding.loginButton -> {
                 loginCallback()
             }
         }
     }
 
     private fun loginCallback() {
-        LoginManager.getInstance().registerCallback(callbackManager,
+        binding.loginButton.registerCallback(callbackManager,
             object : FacebookCallback<LoginResult?> {
 
                 override fun onSuccess(result: LoginResult?) {
-                    Log.d(TAG, "onSuccess: $result")
-                    Toast.makeText(application, "login Successfully", Toast.LENGTH_SHORT).show()
+                    val request: GraphRequest = GraphRequest.newMeRequest(
+                        result?.accessToken
+                    ) { obj, response -> setProfileView(obj) }
+
+                    val bundle = Bundle()
+                    bundle.putString("fields", "id,name,email,gender,birthday")
+                    request.parameters = bundle
+                    request.executeAsync()
                 }
+
                 override fun onCancel() {
-                    // App code
+                    TODO("Not yet implemented")
                 }
 
                 override fun onError(error: FacebookException) {
-                    Toast.makeText(application, "login error", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "error to Login Facebook",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show();
                 }
             })
+    }
+
+    private fun setProfileView(obj: JSONObject?) {
+        try {
+            binding.email.text = obj?.getString("email")
+            binding.name.text = obj?.getString("name")
+            binding.gender.text = obj?.getString("gender")
+            binding.birthday.text = obj?.getString("birthday")
+
+            binding.profilePicture.presetSize = ProfilePictureView.NORMAL
+            binding.profilePicture.profileId = obj?.getString("id")
+
+            binding.layoutInfo.visibility = View.VISIBLE
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         callbackManager.onActivityResult(requestCode, resultCode, data)
         super.onActivityResult(requestCode, resultCode, data)
     }
+
 }
