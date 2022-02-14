@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SocialMediaIntegration">
         <activity
-            android:name=".FacebookProfile"
+            android:name=".ProfileActivity"
             android:exported="false" />
         <activity
             android:name="com.facebook.FacebookActivity"

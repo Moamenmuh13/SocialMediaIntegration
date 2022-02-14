@@ -5,4 +5,17 @@
     <string name="fb_login_protocol_scheme">fb1234</string>
     <string name="facebook_client_token">56789</string>
     <string name="login_with_facebook">Login With Facebook</string>
+
+
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_pw">Confirm Password</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="create_acc">Create a new account</string>
+    <string name="create" translatable="false">Create</string>
+    <string name="create_acc_full_txt">Create Account.</string>
+    <string name="login">Login</string>
+    <string name="ready_email">testing@gmail.com</string>
+    <string name="ready_pw">123456789</string>
+
 </resources>

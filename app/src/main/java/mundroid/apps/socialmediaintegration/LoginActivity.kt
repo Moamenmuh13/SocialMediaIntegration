@@ -1,112 +1,139 @@
 package mundroid.apps.socialmediaintegration
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
 import com.facebook.*
 import com.facebook.appevents.AppEventsLogger
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
-import com.facebook.login.widget.ProfilePictureView
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
 import mundroid.apps.socialmediaintegration.databinding.ActivityLoginBinding
-import org.json.JSONException
-import org.json.JSONObject
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var callbackManager: CallbackManager
+    private lateinit var googleSignInOptions: GoogleSignInOptions
+    private lateinit var googleSignInClient: GoogleSignInClient
+    private val GOOGLE_REQUEST_CODE = 1000
+
+    val KEY = "FACEBOOK_LOGIN"
+
     private val EMAIL = "email"
     private val TAG = "LoginActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+
 
         FacebookSdk.fullyInitialize()
         AppEventsLogger.activateApp(application)
 
-        callbackManager = CallbackManager.Factory.create()
+        checkCurrentUser()
 
+        callbackManager = CallbackManager.Factory.create()
+        loginCallback()
+
+        makeInstance()
         initViews()
 
     }
 
+    private fun makeInstance() {
+        googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .build()
+
+        googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
+    }
 
     private fun initViews() {
-        binding.loginButton.setOnClickListener(this)
+        binding.facebookBtn.setOnClickListener(this)
+        binding.googleBtn.setOnClickListener(this)
+        binding.loginBtn.isEnabled = false
+
 //        binding.facebookBtn.setReadPermissions(listOf(EMAIL))
     }
 
     override fun onClick(v: View?) {
         when (v) {
-            binding.loginButton -> {
-                loginCallback()
+            binding.facebookBtn -> {
+                LoginManager.getInstance()
+                    .logInWithReadPermissions(this, listOf("public_profile"));
+            }
+            binding.googleBtn -> {
+                signInWithGoogle()
             }
         }
     }
 
     private fun loginCallback() {
-        binding.loginButton.registerCallback(callbackManager,
-            object : FacebookCallback<LoginResult?> {
-
-                override fun onSuccess(result: LoginResult?) {
-                    val request: GraphRequest = GraphRequest.newMeRequest(
-                        result?.accessToken
-                    ) { obj, response -> setProfileView(obj) }
-
-                    val bundle = Bundle()
-                    bundle.putString("fields", "id,name,email,gender,birthday")
-                    request.parameters = bundle
-                    request.executeAsync()
+        val loginManager = LoginManager.getInstance()
+            .registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+                override fun onSuccess(result: LoginResult) {
+                    startingProfileActivity()
                 }
 
                 override fun onCancel() {
-                    TODO("Not yet implemented")
                 }
 
                 override fun onError(error: FacebookException) {
-                    Toast.makeText(
-                        this@LoginActivity,
-                        "error to Login Facebook",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show();
+                    Log.d(KEY, "onError: " + error.message)
                 }
-            })
+
+
+            }
+            )
     }
 
-    private fun setProfileView(obj: JSONObject?) {
-        try {
-            binding.email.text = obj?.getString("email")
-            binding.name.text = obj?.getString("name")
-            binding.gender.text = obj?.getString("gender")
-            binding.birthday.text = obj?.getString("birthday")
+    private fun signInWithGoogle() {
+        val intent = googleSignInClient.signInIntent
+        startActivityForResult(intent, GOOGLE_REQUEST_CODE)
+    }
 
-            binding.profilePicture.presetSize = ProfilePictureView.NORMAL
-            binding.profilePicture.profileId = obj?.getString("id")
 
-            binding.layoutInfo.visibility = View.VISIBLE
-        } catch (e: JSONException) {
-            e.printStackTrace()
+    private fun checkCurrentUser() {
+
+        val accessToken = AccessToken.getCurrentAccessToken()
+
+
+        val account = GoogleSignIn.getLastSignedInAccount(this)
+        if (account != null || accessToken != null && !accessToken.isExpired) {
+            startingProfileActivity()
         }
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         callbackManager.onActivityResult(requestCode, resultCode, data)
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == GOOGLE_REQUEST_CODE) {
+            val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                task.getResult(ApiException::class.java)
+                startingProfileActivity()
+            } catch (e: ApiException) {
+                Toast.makeText(this, "Try Again", Toast.LENGTH_SHORT).show();
+
+            }
+        }
+
     }
 
+    private fun startingProfileActivity() {
+        startActivity(Intent(this, ProfileActivity::class.java))
+        finish()
+    }
 }
