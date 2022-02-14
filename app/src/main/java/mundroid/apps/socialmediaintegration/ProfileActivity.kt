@@ -80,7 +80,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
             accessToken
         ) { `object`, response ->
             try {
-
                 email = `object`!!.getString("email")
                 userName = `object`.getString("name")
                 gender = `object`.getString("gender")
@@ -98,10 +97,14 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
                 Log.d(TAG, "onCompleted: Error ( " + e.message + ") ")
             }
         }
+        request.parameters = setParameters()
+        request.executeAsync()
+    }
+
+    private fun setParameters(): Bundle {
         val parameters = Bundle()
         parameters.putString("fields", "email,name,gender,birthday,picture.type(large)")
-        request.parameters = parameters
-        request.executeAsync()
+        return parameters
     }
 
 
