@@ -26,33 +26,33 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var callbackManager: CallbackManager
     private lateinit var googleSignInOptions: GoogleSignInOptions
     private lateinit var googleSignInClient: GoogleSignInClient
-    private val GOOGLE_REQUEST_CODE = 1000
+    private val REQUEST_CODE = 1000
 
     val KEY = "FACEBOOK_LOGIN"
 
-    private val EMAIL = "email"
-    private val TAG = "LoginActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
 
-
         FacebookSdk.fullyInitialize()
         AppEventsLogger.activateApp(application)
 
         checkCurrentUser()
 
-        callbackManager = CallbackManager.Factory.create()
         loginCallback()
 
         makeInstance()
+
         initViews()
 
     }
 
     private fun makeInstance() {
+        callbackManager = CallbackManager.Factory.create()
+
+
         googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .build()
@@ -81,7 +81,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun loginCallback() {
-        val loginManager = LoginManager.getInstance()
+        LoginManager.getInstance()
             .registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
                 override fun onSuccess(result: LoginResult) {
                     startingProfileActivity()
@@ -101,7 +101,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun signInWithGoogle() {
         val intent = googleSignInClient.signInIntent
-        startActivityForResult(intent, GOOGLE_REQUEST_CODE)
+        startActivityForResult(intent, REQUEST_CODE)
     }
 
 
@@ -119,7 +119,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         callbackManager.onActivityResult(requestCode, resultCode, data)
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == GOOGLE_REQUEST_CODE) {
+        if (requestCode == REQUEST_CODE) {
             val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 task.getResult(ApiException::class.java)

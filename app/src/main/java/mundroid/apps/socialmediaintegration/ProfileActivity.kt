@@ -42,12 +42,12 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_profile)
 
         initGoogle()
-        initBtns()
+        initViews()
         getDataFromFacebook()
         getDataFromGoogle()
     }
 
-    private fun initBtns() {
+    private fun initViews() {
         binding.signOutBtn.setOnClickListener(this)
     }
 
@@ -63,7 +63,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun getDataFromGoogle() {
-        var googleSignInAccount =
+        val googleSignInAccount =
             GoogleSignIn.getLastSignedInAccount(this)
         if (googleSignInAccount != null) {
             userName = googleSignInAccount.displayName
@@ -78,7 +78,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
     private fun getDataFromFacebook() {
         val request = GraphRequest.newMeRequest(
             accessToken
-        ) { `object`, response ->
+        ) { `object`, _ ->
             try {
                 email = `object`!!.getString("email")
                 userName = `object`.getString("name")
@@ -124,11 +124,11 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
         builder1.setPositiveButton(
             "Yes"
-        ) { dialog, id -> logout() }
+        ) { _, _ -> logout() }
 
         builder1.setNegativeButton(
             "No"
-        ) { dialog, id -> dialog.cancel() }
+        ) { dialog, _ -> dialog.cancel() }
 
         val alert11 = builder1.create()
         alert11.show()
@@ -138,7 +138,6 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         googleSignInClient.signOut().addOnCompleteListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }
-
         LoginManager.getInstance().logOut()
     }
 
