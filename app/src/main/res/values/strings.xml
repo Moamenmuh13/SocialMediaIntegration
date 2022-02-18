@@ -17,5 +17,7 @@
     <string name="login">Login</string>
     <string name="ready_email">testing@gmail.com</string>
     <string name="ready_pw">123456789</string>
+    <string name="or">OR</string>
+    <string name="login_with">Login With</string>
 
 </resources>

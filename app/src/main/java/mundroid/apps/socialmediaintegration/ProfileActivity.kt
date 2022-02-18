@@ -2,9 +2,11 @@ package mundroid.apps.socialmediaintegration
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -49,6 +51,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun initViews() {
         binding.signOutBtn.setOnClickListener(this)
+        binding.progressBar.isClickable = false
     }
 
     private fun initGoogle() {
@@ -76,6 +79,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
 
     private fun getDataFromFacebook() {
+        binding.progressBar.visibility = View.VISIBLE
         val request = GraphRequest.newMeRequest(
             accessToken
         ) { `object`, _ ->
@@ -99,6 +103,7 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
         }
         request.parameters = setParameters()
         request.executeAsync()
+        binding.progressBar.visibility = View.INVISIBLE
     }
 
     private fun setParameters(): Bundle {
@@ -136,16 +141,18 @@ class ProfileActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun logout() {
         googleSignInClient.signOut().addOnCompleteListener {
-            startActivity(Intent(this, LoginActivity::class.java))
-        }
+        backToLoginActivity()
         LoginManager.getInstance().logOut()
     }
-
+    }
     override fun onClick(v: View?) {
         when (v) {
             binding.signOutBtn -> {
                 showDialog()
             }
         }
+    }
+    private fun backToLoginActivity(){
+        startActivity(Intent(this, LoginActivity::class.java))
     }
 }

@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Mu/StudioProjects/SocialMediaIntegration/app/src/main/res/layout/activity_login.xml" value="0.27291666666666664" />
+        <entry key="..\:/Users/Mu/StudioProjects/SocialMediaIntegration/app/src/main/res/layout/activity_profile.xml" value="0.27291666666666664" />
         <entry key="..\:/Users/momen/.gradle/caches/transforms-3/d34d422f61283604d9d9a4794eeec026/transformed/facebook-common-12.3.0/res/drawable/com_facebook_button_icon.xml" value="0.225" />
         <entry key="..\:/Users/momen/projects/SocialMediaIntegration/app/src/main/res/drawable/bg_button_facebook.xml" value="0.225" />
         <entry key="..\:/Users/momen/projects/SocialMediaIntegration/app/src/main/res/drawable/custom_mail_icon.xml" value="0.2985" />

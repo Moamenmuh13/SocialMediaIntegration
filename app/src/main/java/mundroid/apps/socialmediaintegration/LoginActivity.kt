@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -26,6 +27,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var callbackManager: CallbackManager
     private lateinit var googleSignInOptions: GoogleSignInOptions
     private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var mProgressBar: ProgressBar
     private val REQUEST_CODE = 1000
 
     val KEY = "FACEBOOK_LOGIN"
@@ -34,11 +36,12 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
         FacebookSdk.fullyInitialize()
         AppEventsLogger.activateApp(application)
 
+        binding.logoImg.visibility = View.VISIBLE
         checkCurrentUser()
 
         loginCallback()
@@ -52,7 +55,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     private fun makeInstance() {
         callbackManager = CallbackManager.Factory.create()
 
-
         googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .build()
@@ -61,6 +63,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun initViews() {
+        mProgressBar = ProgressBar(this)
         binding.facebookBtn.setOnClickListener(this)
         binding.googleBtn.setOnClickListener(this)
         binding.loginBtn.isEnabled = false
@@ -72,7 +75,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         when (v) {
             binding.facebookBtn -> {
                 LoginManager.getInstance()
-                    .logInWithReadPermissions(this, listOf("public_profile"));
+                    .logInWithReadPermissions(this, listOf("public_profile"))
             }
             binding.googleBtn -> {
                 signInWithGoogle()
@@ -93,10 +96,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                 override fun onError(error: FacebookException) {
                     Log.d(KEY, "onError: " + error.message)
                 }
-
-
-            }
-            )
+            })
     }
 
     private fun signInWithGoogle() {
@@ -108,7 +108,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     private fun checkCurrentUser() {
 
         val accessToken = AccessToken.getCurrentAccessToken()
-
 
         val account = GoogleSignIn.getLastSignedInAccount(this)
         if (account != null || accessToken != null && !accessToken.isExpired) {
@@ -125,7 +124,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                 task.getResult(ApiException::class.java)
                 startingProfileActivity()
             } catch (e: ApiException) {
-                Toast.makeText(this, "Try Again", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Try Again", Toast.LENGTH_SHORT).show()
 
             }
         }
